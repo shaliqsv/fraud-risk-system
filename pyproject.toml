@@ -6,6 +6,7 @@ dependencies = [
     "pandas",
     "numpy",
     "scikit-learn",
+    "seaborn",
     "catboost",
     "xgboost",
     "lightgbm",
@@ -17,6 +18,11 @@ dependencies = [
     "fastapi",
     "uvicorn",
     "pydantic",
+    "azure-ai-ml",
+    "azure-identity",
+    "azureml-mlflow",
+    "python-dotenv",
+    "azure-storage-blob"
 ]
 
 [build-system]
