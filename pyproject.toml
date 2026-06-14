@@ -22,7 +22,8 @@ dependencies = [
     "azure-identity",
     "azureml-mlflow",
     "python-dotenv",
-    "azure-storage-blob"
+    "azure-storage-blob",
+    "optuna>=4.9.0",
 ]
 
 [build-system]
