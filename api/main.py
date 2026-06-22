@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 
 from api.model_loader import model_bundle
+from api.prediction_logger import log_prediction
 from api.schemas import (
     HealthResponse,
     MetadataResponse,
@@ -37,8 +38,19 @@ def predict(request: PredictionRequest) -> PredictionResponse:
         )
 
     proba = model_bundle.predict_proba(request.features)
-    return PredictionResponse(
+    is_fraud = proba >= model_bundle.threshold
+
+    log_prediction(
+        transaction_id=request.transaction_id,
+        features=request.features,
         fraud_probability=proba,
-        is_fraud=proba >= model_bundle.threshold,
+        is_fraud=is_fraud,
+        threshold_used=model_bundle.threshold,
+    )
+
+    return PredictionResponse(
+        transaction_id=request.transaction_id,
+        fraud_probability=proba,
+        is_fraud=is_fraud,
         threshold_used=model_bundle.threshold,
     )

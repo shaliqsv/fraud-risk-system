@@ -24,6 +24,7 @@ dependencies = [
     "python-dotenv",
     "azure-storage-blob",
     "optuna>=4.9.0",
+    "psycopg2-binary>=2.9.12",
 ]
 
 [build-system]
@@ -43,6 +44,7 @@ dev = [
 [tool.ruff]
 line-length = 88
 target-version = "py311"
+extend-exclude = ["*.ipynb"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
