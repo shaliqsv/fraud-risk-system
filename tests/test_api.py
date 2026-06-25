@@ -1,3 +1,8 @@
+import os
+import uuid
+
+import psycopg2
+import pytest
 from fastapi.testclient import TestClient
 
 from api.main import app
@@ -36,3 +41,33 @@ def test_predict_full_request():
     assert 0.0 <= data["fraud_probability"] <= 1.0
     assert data["threshold_used"] == model_bundle.threshold
     assert data["is_fraud"] == (data["fraud_probability"] >= model_bundle.threshold)
+
+
+@pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="DATABASE_URL not set")
+def test_predict_logs_prediction():
+    transaction_id = f"test-{uuid.uuid4()}"
+    features = dict.fromkeys(model_bundle.feature_names, 0)
+
+    response = client.post(
+        "/predict", json={"transaction_id": transaction_id, "features": features}
+    )
+    assert response.status_code == 200
+    data = response.json()
+
+    conn = psycopg2.connect(os.environ["DATABASE_URL"])
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT fraud_probability, is_fraud, threshold_used "
+                "FROM predictions WHERE transaction_id = %s",
+                (transaction_id,),
+            )
+            row = cur.fetchone()
+    finally:
+        conn.close()
+
+    assert row is not None, "Expected a logged row for this transaction_id"
+    logged_proba, logged_is_fraud, logged_threshold = row
+    assert logged_proba == pytest.approx(data["fraud_probability"])
+    assert logged_is_fraud == data["is_fraud"]
+    assert logged_threshold == data["threshold_used"]

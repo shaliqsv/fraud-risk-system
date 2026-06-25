@@ -27,6 +27,7 @@ jobs:
       - name: Run tests
         env:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: uv run pytest tests/test_api.py -v
 
       - name: Login to Azure
@@ -48,4 +49,4 @@ jobs:
             --name fraud-api \
             --resource-group shaliq_study \
             --image fraudriskregistry.azurecr.io/fraud-api:${{ github.sha }} \
-            --set-env-vars AZURE_STORAGE_CONNECTION_STRING=secretref:azure-storage-connection-string
+            --set-env-vars AZURE_STORAGE_CONNECTION_STRING=secretref:azure-storage-connection-string DATABASE_URL=secretref:database-url
