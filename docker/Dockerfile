@@ -13,6 +13,7 @@ RUN pip install --no-cache-dir uv \
 
 # App code
 COPY api/ ./api/
+COPY src/ ./src/
 
 EXPOSE 8000
 
